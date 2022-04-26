@@ -9,12 +9,28 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@angular/common": "^13.3.4",
+    "@angular/compiler": "^13.0.0",
+    "@angular/compiler-cli": "^13.3.4",
+    "@angular/forms": "^13.3.4",
+    "@angular/platform-browser-dynamic": "^13.3.4",
+    "@angular/platform-server": "^13.3.4",
+    "@ctrl/ngx-emoji-mart": "^6.2.0",
+    "@emoji-mart/data": "^1.0.1",
+    "@heroicons/react": "^1.0.6",
+    "emoji-mart": "^5.0.0",
+    "emoji-picker-react": "^3.5.1",
     "next": "12.1.5",
     "react": "18.0.0",
-    "react-dom": "18.0.0"
+    "react-dom": "18.0.0",
+    "tailwind-scrollbar-hide": "^1.1.7",
+    "twemoji": "github:twitter/twemoji"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.5",
     "eslint": "8.14.0",
-    "eslint-config-next": "12.1.5"
+    "eslint-config-next": "12.1.5",
+    "postcss": "^8.4.12",
+    "tailwindcss": "^3.0.24"
   }
 }
