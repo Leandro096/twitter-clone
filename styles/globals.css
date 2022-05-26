@@ -1,11 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import '~@ctrl/ngx-emoji-mart/picker';
 
 @layer base {
   body {
     @apply bg-black
+    overflow-auto
+    scrollbar-hide
+  }
+
+  .noBars {
+    @apply overflow-auto
+    scrollbar-hide
+    scrollbar-x-hide
   }
 }
 
@@ -18,3 +25,4 @@
     @apply cursor-pointer w-9 h-9 hover:bg-[#1d9bf0] hover:bg-opacity-10 flex items-center justify-center rounded-full transition ease-out;
   }
 }
+
