@@ -8,12 +8,6 @@
     overflow-auto
     scrollbar-hide
   }
-
-  .noBars {
-    @apply overflow-auto
-    scrollbar-hide
-    scrollbar-x-hide
-  }
 }
 
 @layer components {

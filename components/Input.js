@@ -99,7 +99,7 @@ function Input() {
             value={input} rows="2"
             placeholder="What's happening?"
             onChange={(e) => setInput(e.target.value)}
-            className="bg-transparent outlinr-none text-[#d9d9d9] text-lg placeholder-gray-500 tracking-wide w-full min-h-[50px]"
+            className="bg-transparent outlinr-none text-[#d9d9d9] text-lg placeholder-gray-500 tracking-wide w-full min-h-[50px] overflow-auto break-words text-justify"
           />
 
           {selectedFile && (

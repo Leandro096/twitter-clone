@@ -8,8 +8,9 @@ import {
   addDoc,
   collection,
   serverTimestamp,
+  updateDoc,
 } from "@firebase/firestore";
-import { db } from "../firebase";
+import { db, storage } from "../firebase";
 import { useSession } from "next-auth/react";
 import {
   CalendarIcon,
@@ -20,6 +21,9 @@ import {
 } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
 import Moment from "react-moment";
+import { useRef } from "react";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { async } from "@firebase/util";
 
 function Modal() {
   const { data: session } = useSession();
@@ -28,6 +32,10 @@ function Modal() {
   const [post, setPost] = useState();
   const [comment, setComment] = useState("");
   const router = useRouter();
+  
+  const [selectedFile, setSelectedFile] = useState(null);
+  const filePickerRef = useRef(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(
     () =>
@@ -39,19 +47,48 @@ function Modal() {
 
   const sendComment = async (e) => {
     e.preventDefault();
+    if (loading) return;
+    setLoading(true);
 
-    await addDoc(collection(db, "posts", postId, "comments"), {
+    const docRef = await addDoc(collection(db, "posts", postId, "comments"), {
       comment: comment,
+      id: session.user.uid,
       username: session.user.name,
-      tag: session.user.tag,
       userImg: session.user.image,
+      tag: session.user.tag,
       timestamp: serverTimestamp(),
     });
+
+    const imageRef = ref(storage, `comments/${docRef.id}/image`)
+
+    if (selectedFile) {
+      await uploadString(imageRef, selectedFile, "data_url").then(async () => {
+        const downloadURL = await getDownloadURL(imageRef)
+        await updateDoc(doc(db, "posts", postId, "comments", docRef.id), {
+          image: downloadURL,
+        });
+      });
+    }
+
+    setLoading(false);
+    setSelectedFile(null);
+    //setSelectedEmojis(false);
 
     setIsOpen(false);
     setComment("");
 
     router.push(`/${postId}`);
+  };
+
+  const addImageToComment = (e) => {
+    const reader = new FileReader();
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0])
+    }
+
+    reader.onload = (readerEvent) => {
+      setSelectedFile(readerEvent.target.result);
+    };
   };
 
   return (
@@ -131,33 +168,56 @@ function Modal() {
                         className="bg-transparent outline-none text-[#d9d9d9] text-lg placeholder-gray-500 tracking-wide w-full min-h-[80px]"
                       />
 
-                      <div className="flex items-center justify-between pt-2.5">
-                        <div className="flex items-center">
-                          <div className="icon">
-                            <PhotographIcon className="text-[#1d9bf0] h-[22px]" />
+                      {selectedFile && (
+                        <div className="relative">
+                          <div
+                            className="absolute w-8 h-8 bg-[#15181c] hover:bg-[#272c26] bg-opacity-75 rounded-full flex items-center justify-center top-1 left-1 cursor-pointer" onClick={() => setSelectedFile(null)}
+                          >
+                            <XIcon className="text-white h-5" />
                           </div>
-
-                          <div className="icon rotate-90">
-                            <ChartBarIcon className="text-[#1d9bf0] h-[22px]" />
-                          </div>
-
-                          <div className="icon">
-                            <EmojiHappyIcon className="text-[#1d9bf0] h-[22px]" />
-                          </div>
-
-                          <div className="icon">
-                            <CalendarIcon className="text-[#1d9bf0] h-[22px]" />
-                          </div>
+                          <img
+                            src={selectedFile}
+                            alt=""
+                            className="rounded-2xl max-h-80 object-contain"
+                          />
                         </div>
-                        <button
-                          className="bg-[#1d9bf0] text-white rounded-full px-4 py-1.5 font-bold shadow-md hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 disabled:cursor-default"
-                          type="submit"
-                          onClick={sendComment}
-                          disabled={!comment.trim()}
-                        >
-                          Reply
-                        </button>
-                      </div>
+                      )}
+
+                      {!loading && (
+                        <div className="flex items-center justify-between pt-2.5">
+                          <div className="flex items-center">
+                            <div className="icon" onClick={() => filePickerRef.current.click()}>
+                              <PhotographIcon className="text-[#1d9bf0] h-[22px]" />
+                              <input
+                                type="file"
+                                hidden
+                                onChange={addImageToComment}
+                                ref={filePickerRef}
+                              />
+                            </div>
+
+                            <div className="icon rotate-90">
+                              <ChartBarIcon className="text-[#1d9bf0] h-[22px]" />
+                            </div>
+
+                            <div className="icon">
+                              <EmojiHappyIcon className="text-[#1d9bf0] h-[22px]" />
+                            </div>
+
+                            <div className="icon">
+                              <CalendarIcon className="text-[#1d9bf0] h-[22px]" />
+                            </div>
+                          </div>
+                          <button
+                            className="bg-[#1d9bf0] text-white rounded-full px-4 py-1.5 font-bold shadow-md hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 disabled:cursor-default"
+                            type="submit"
+                            onClick={sendComment}
+                            disabled={!comment.trim() && !selectedFile}
+                          >
+                            Reply
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -30,8 +30,13 @@ import {
               <span className="hover:underline text-sm sm:text-[15px]">
                 <Moment fromNow>{comment?.timestamp?.toDate()}</Moment>
               </span>
-              <p className="text-[#d9d9d9] mt-0.5 max-w-lg overflow-scroll text-[15px] sm:text-base">
+              <p className="text-[#d9d9d9] mt-0.5 max-w-lg overflow-auto scrollbar-hide text-[15px] sm:text-base break-words text-justify">
                 {comment?.comment}
+                <img
+                src={comment?.image}
+                alt=""
+                className="rounded-2xl max-h-[700px] object-cover mr-2"
+              />
               </p>
             </div>
             <div className="icon group flex-shrink-0">

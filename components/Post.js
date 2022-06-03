@@ -97,7 +97,7 @@ import {collection, deleteDoc, doc, onSnapshot, orderBy, query, setDoc} from "@f
                 <Moment fromNow>{post?.timestamp?.toDate()}</Moment>
               </span>
               {!postPage && (
-                <p className="text-[#d9d9d9] text-[15px] sm:text-base mt-0.5">
+                <p className="text-[#d9d9d9] text-[15px] sm:text-base mt-0.5 overflow-auto break-words text-justify">
                   {post?.text}
                 </p>
               )}
